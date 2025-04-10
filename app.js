@@ -6,10 +6,12 @@ import TelegramBot from 'node-telegram-bot-api'
 
 let bot
 if (config.telegram.should_use_webhooks) {
-    bot = new TelegramBot(config.telegram.token, {webHook: {port: config.port}})
+    bot = new TelegramBot(config.telegram.token, {webHook: {port: 443}})
     await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
+    console.log(`Webhook mode enabled, listening on ${config.externalUrl}/bot${config.telegram.token}`)
 } else {
     bot = new TelegramBot(config.telegram.token, {polling: true})
+    console.log('Polling mode enabled')
 }
 
 const app = express()
@@ -24,7 +26,7 @@ app.post(`/bot${config.telegram.token}`, (req, res) => {
     res.sendStatus(200)
 })
 
-const listener = app.listen(process.env.PORT, async ()=>  {
+const listener = app.listen(config.port, async ()=>  {
     console.log('Listening on port ', + listener.address().port)
 })
 
@@ -47,7 +49,10 @@ bot.on('callback_query', async (callbackQuery) =>  {
             }
 
             let responseMessage = `No decisions found for IP: ${ip}`
-            if (deletedDecisions > 0) {
+            if (deletedDecisions === 1) {
+                responseMessage = `${deletedDecisions} decision deleted for IP: ${ip}`
+            }
+            else if (deletedDecisions > 0) {
                 responseMessage = `${deletedDecisions} decisions deleted for IP: ${ip}`
             }
 
