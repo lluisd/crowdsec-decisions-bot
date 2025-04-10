@@ -4,15 +4,11 @@ import { config } from './config.js'
 import CrowdsecLocalApi from "./api/crowdsecLocalApi.js"
 import TelegramBot from 'node-telegram-bot-api'
 
-let bot
-if (config.telegram.should_use_webhooks) {
-    bot = new TelegramBot(config.telegram.token, {webHook: {port: config.port}})
-    await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
-    console.log(`Webhook mode enabled, listening on ${config.externalUrl}/bot${config.telegram.token}`)
-} else {
-    bot = new TelegramBot(config.telegram.token, {polling: true})
-    console.log('Polling mode enabled')
+let options = {}
+if (!config.telegram.should_use_webhooks) {
+    options.polling = true
 }
+const bot = new TelegramBot(config.telegram.token, options)
 
 const app = express()
 app.use(express.json())
@@ -26,8 +22,9 @@ app.post(`/bot${config.telegram.token}`, (req, res) => {
     res.sendStatus(200)
 })
 
-const listener = app.listen(config.port, async ()=>  {
-    console.log('Listening on port ', + listener.address().port)
+app.listen(config.port, async ()=>  {
+    console.log('Listening on port ', + config.port)
+    console.log(`Telegram bot with ${config.telegram.should_use_webhooks ? 'Webhook' : 'Polling'} mode`)
 })
 
 bot.on('callback_query', async (callbackQuery) =>  {
