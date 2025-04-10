@@ -6,7 +6,7 @@ import TelegramBot from 'node-telegram-bot-api'
 
 let bot
 if (config.telegram.should_use_webhooks) {
-    bot = new TelegramBot(config.telegram.token, {webHook: {port: 443}})
+    bot = new TelegramBot(config.telegram.token, {webHook: {port: config.port}})
     await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
     console.log(`Webhook mode enabled, listening on ${config.externalUrl}/bot${config.telegram.token}`)
 } else {
