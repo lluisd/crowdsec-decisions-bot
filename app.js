@@ -7,7 +7,7 @@ import TelegramBot from 'node-telegram-bot-api'
 let bot
 if (config.telegram.should_use_webhooks) {
     bot = new TelegramBot(config.telegram.token, {webHook: {port: config.port}})
-    await bot.setWebHook(config.externalUrl + '/bot' + config.telegram.token)
+    await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
 } else {
     bot = new TelegramBot(config.telegram.token, {polling: true})
 }
@@ -16,6 +16,12 @@ const app = express()
 app.use(express.json())
 app.get('/health', function(req, res) {
     res.json({ status: 'UP' })
+})
+
+// We are receiving updates at the route below!
+app.post(`/bot${config.telegram.token}`, (req, res) => {
+    bot.processUpdate(req.body)
+    res.sendStatus(200)
 })
 
 const listener = app.listen(process.env.PORT, async ()=>  {
@@ -50,10 +56,4 @@ bot.on('callback_query', async (callbackQuery) =>  {
     } catch (error) {
         console.log(error)
     }
-});
-
-
-
-
-
-
+})

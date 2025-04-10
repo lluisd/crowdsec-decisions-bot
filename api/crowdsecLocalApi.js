@@ -4,7 +4,7 @@ import { config } from '../config.js'
 let tokenData = {
     token: null,
     expiresAt: null, // timestamp
-};
+}
 
 async function login() {
     const endpoint = `${config.crowdsec.lapi.url}/v1/watchers/login`
@@ -67,7 +67,6 @@ function _getHeaders(token) {
         ...(token && {'Authorization': `Bearer ${token}`})
     }
 }
-
 
 export default {
     deleteDecisionsByIP
