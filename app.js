@@ -10,6 +10,9 @@ if (!config.telegram.should_use_webhooks) {
 }
 const bot = new TelegramBot(config.telegram.token, options)
 
+// This informs the Telegram servers of the new webhook.
+await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
+
 const app = express()
 app.use(express.json())
 app.get('/health', function(req, res) {
