@@ -3,7 +3,7 @@ import { config } from '../config.js'
 
 let tokenData = {
     token: null,
-    expiresAt: null, // timestamp
+    expiresAt: null
 }
 
 async function login() {
@@ -29,15 +29,15 @@ async function login() {
         tokenData.expiresAt = moment.utc(expire).valueOf()
         return token
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 
 async function getValidToken() {
     if (!tokenData.token || moment.utc().valueOf() >= tokenData.expiresAt) {
-        await login();
+        await login()
     }
-    return tokenData.token;
+    return tokenData.token
 }
 
 async function deleteDecisionsByIP(ip) {

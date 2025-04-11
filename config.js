@@ -1,10 +1,10 @@
 export const config = {
-    port: process.env.PORT,
-    externalUrl: process.env.EXTERNAL_URL,
+    port: process.env.PORT || 3000,
     telegram: {
         token: process.env.TELEGRAM_TOKEN,
         channelId: process.env.TELEGRAM_CHAT_ID,
         should_use_webhooks: process.env.USE_WEBHOOKS || false,
+        externalUrl: process.env.EXTERNAL_URL,
     },
     crowdsec: {
         lapi: {
