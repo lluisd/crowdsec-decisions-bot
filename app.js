@@ -10,8 +10,10 @@ if (!config.telegram.should_use_webhooks) {
 }
 const bot = new TelegramBot(config.telegram.token, options)
 
-// This informs the Telegram servers of the new webhook.
-await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
+if (config.telegram.should_use_webhooks) {
+    await bot.setWebHook(`${config.externalUrl}/bot${config.telegram.token}`)
+}
+
 
 const app = express()
 app.use(express.json())
@@ -58,6 +60,7 @@ bot.on('callback_query', async (callbackQuery) =>  {
             }
 
             console.log(responseMessage)
+            await bot.answerCallbackQuery(callbackQuery.id)
             await bot.sendMessage(chatId, responseMessage, options)
         }
     } catch (error) {
