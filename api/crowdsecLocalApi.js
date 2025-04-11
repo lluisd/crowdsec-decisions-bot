@@ -7,6 +7,7 @@ let tokenData = {
 }
 
 async function login() {
+    console.log(`Calling /v1/watchers/login`)
     const endpoint = `${config.crowdsec.lapi.url}/v1/watchers/login`
     const options = {
         headers: _getHeaders(),
@@ -33,13 +34,14 @@ async function login() {
 }
 
 async function getValidToken() {
-    if (!tokenData.token || moment.utc().valueOf() >= tokenData.expiresAt) { // Use moment to check expiration
+    if (!tokenData.token || moment.utc().valueOf() >= tokenData.expiresAt) {
         await login();
     }
     return tokenData.token;
 }
 
 async function deleteDecisionsByIP(ip) {
+    console.log(`Calling /v1/decisions?ip=${ip}`)
     const token = await getValidToken()
     const endpoint = `${config.crowdsec.lapi.url}/v1/decisions?ip=${ip}`
     const options = {

@@ -32,6 +32,7 @@ app.listen(config.port, async ()=>  {
 
 bot.on('callback_query', async (callbackQuery) =>  {
     try {
+        console.log('received a callback_query')
         const inlineQuery = callbackQuery.data.split('~')[0]
         if (inlineQuery === 'deleteDecisions') {
             let ip = callbackQuery.data.split('~')[1]
@@ -56,6 +57,7 @@ bot.on('callback_query', async (callbackQuery) =>  {
                 responseMessage = `${deletedDecisions} decisions deleted for IP: ${ip}`
             }
 
+            console.log(responseMessage)
             await bot.sendMessage(chatId, responseMessage, options)
         }
     } catch (error) {
