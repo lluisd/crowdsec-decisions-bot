@@ -22,6 +22,20 @@ if (config.telegram.should_use_webhooks) {
     })
 }
 
+app.post('/unifi', async  function(req, res, next) {
+    try {
+        const data = req.body
+        console.log('Received unifi: ' + JSON.stringify(data, null, 2))
+        const response = {
+            message: data,
+            status: 'success'
+        };
+        res.json(response)
+    } catch (error) {
+        next(error)
+    }
+})
+
 app.listen(config.port, async ()=>  {
     console.log('Listening on port ', + config.port)
     console.log(`Telegram bot on ${config.telegram.should_use_webhooks ? 'Webhook' : 'Polling'} mode`)
