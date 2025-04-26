@@ -2,52 +2,68 @@ import 'dotenv/config'
 import express from "express"
 import { config } from './config.js'
 import crowdsecHandler from "./handlers/crowdsecHandler.js"
+import unifiDetectionsHandler from "./handlers/unifiDetectionsHandler.js"
 import TelegramBot from 'node-telegram-bot-api'
+import mongoose from 'mongoose'
+import cron from 'node-cron'
 
-const bot = new TelegramBot(config.telegram.token, { polling: !config.telegram.should_use_webhooks})
+mongoose.connect(config.database, {dbName: 'cti'}).then(async () => {
+    console.log('Connected')
 
-if (config.telegram.should_use_webhooks)
-    await bot.setWebHook(`${config.telegram.externalUrl}/bot${config.telegram.token}`)
+    const bot = new TelegramBot(config.telegram.token, {polling: !config.telegram.should_use_webhooks})
 
-const app = express()
-app.use(express.json())
-app.get('/health', function(req, res) {
-    res.json({ status: 'UP' })
-})
+    if (config.telegram.should_use_webhooks)
+        await bot.setWebHook(`${config.telegram.externalUrl}/bot${config.telegram.token}`)
 
-if (config.telegram.should_use_webhooks) {
-    app.post(`/bot${config.telegram.token}`, (req, res) => {
-        bot.processUpdate(req.body)
-        res.sendStatus(200)
+    const app = express()
+    app.use(express.json())
+    app.get('/health', function (req, res) {
+        res.json({status: 'UP'})
     })
-}
 
-app.post('/unifi', async  function(req, res, next) {
-    try {
-        const data = req.body
-        console.log('Received unifi: ' + JSON.stringify(data, null, 2))
-        const response = {
-            message: data,
-            status: 'success'
-        };
-        res.json(response)
-    } catch (error) {
-        next(error)
+    if (config.telegram.should_use_webhooks) {
+        app.post(`/bot${config.telegram.token}`, (req, res) => {
+            bot.processUpdate(req.body)
+            res.sendStatus(200)
+        })
     }
-})
 
-app.listen(config.port, async ()=>  {
-    console.log('Listening on port ', + config.port)
-    console.log(`Telegram bot on ${config.telegram.should_use_webhooks ? 'Webhook' : 'Polling'} mode`)
-})
+    app.get('/health', function (req, res) {
+        res.json({status: 'UP'})
+    })
 
-bot.on('callback_query', async (callbackQuery) =>  {
-    try {
-        const inlineQuery = callbackQuery.data.split('~')[0]
-        if (inlineQuery === 'deleteDecisions') {
-            return await crowdsecHandler.deleteDecisionByIp(callbackQuery, bot)
+    app.post('/detection', async function (req, res, next) {
+        try {
+            const data = req.body
+            console.log('Received unifi detection: ' + JSON.stringify(data, null, 2))
+            await unifiDetectionsHandler.notifyDetection(data, bot)
+            const response = {
+                message: data,
+                status: 'success'
+            };
+            res.json(response)
+        } catch (error) {
+            next(error)
         }
-    } catch (error) {
-        console.log(error)
-    }
+    })
+
+    app.listen(config.port, async () => {
+        console.log('Listening on port ', +config.port)
+        console.log(`Telegram bot on ${config.telegram.should_use_webhooks ? 'Webhook' : 'Polling'} mode`)
+    })
+
+    bot.on('callback_query', async (callbackQuery) => {
+        try {
+            const inlineQuery = callbackQuery.data.split('~')[0]
+            if (inlineQuery === 'deleteDecisions') {
+                return await crowdsecHandler.deleteDecisionByIp(callbackQuery, bot)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    })
+
+    cron.schedule('*/10 * * * *', async () => {
+        await unifiDetectionsHandler.removeExpiredCtiIps()
+    })
 })

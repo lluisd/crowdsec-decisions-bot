@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { config } from '../config.js'
+import {config} from '../config.js'
 
 let tokenData = {
     token: null,
@@ -45,7 +45,7 @@ async function deleteDecisionsByIP(ip) {
     const token = await getValidToken()
     const endpoint = `${config.crowdsec.lapi.url}/v1/decisions?ip=${ip}`
     const options = {
-        headers: _getHeaders(token),
+        headers: _getHeadersWithAuthToken(token),
         method: 'DELETE',
     }
 
@@ -61,15 +61,47 @@ async function deleteDecisionsByIP(ip) {
     }
 }
 
+async function getDecisionsByIP(ip) {
+    console.log(`Calling GET /v1/decisions?ip=${ip}`)
+    const endpoint = `${config.crowdsec.lapi.url}/v1/decisions?ip=${ip}`
+    const options = {
+        headers: _getHeadersWithXApiKey(),
+    }
+
+    try {
+        const response = await fetch(endpoint, options)
+        if (!response.ok) {
+            throw new Error(`HTTP Error on crowdsec lapi get decision status: ${response.status}`)
+        }
+        return await response.json()
+    } catch (error) {
+        throw error
+    }
+}
+
 function _getHeaders(token) {
     return {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'user-agent': 'decisionsBot/5.0',
-        ...(token && {'Authorization': `Bearer ${token}`})
+        'user-agent': 'decisionsBot/5.0'
+    }
+}
+
+function _getHeadersWithAuthToken(token) {
+    return {
+        ..._getHeaders(),
+        'Authorization': `Bearer ${token}`
+    }
+}
+
+function _getHeadersWithXApiKey() {
+    return {
+        ..._getHeaders(),
+        'x-api-key': config.crowdsec.lapi.apiKey
     }
 }
 
 export default {
-    deleteDecisionsByIP
+    deleteDecisionsByIP,
+    getDecisionsByIP
 }
