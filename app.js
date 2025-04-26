@@ -34,11 +34,13 @@ mongoose.connect(config.database, {dbName: 'cti'}).then(async () => {
 
     app.post('/detection', async function (req, res, next) {
         try {
-            const data = req.body
-            console.log('Received unifi detection: ' + JSON.stringify(data, null, 2))
-            await unifiDetectionsHandler.notifyDetection(data, bot)
+            const detections = req.body
+            console.log('Received unifi detection: ' + JSON.stringify(detections, null, 2))
+            for (const detection of detections) {
+                await unifiDetectionsHandler.notifyDetection(detection, bot)
+            }
             const response = {
-                message: data,
+                message: detections,
                 status: 'success'
             };
             res.json(response)
