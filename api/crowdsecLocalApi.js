@@ -61,24 +61,6 @@ async function deleteDecisionsByIP(ip) {
     }
 }
 
-async function getDecisionsByIP(ip) {
-    console.log(`Calling GET /v1/decisions?ip=${ip}`)
-    const endpoint = `${config.crowdsec.lapi.url}/v1/decisions?ip=${ip}`
-    const options = {
-        headers: _getHeadersWithXApiKey(),
-    }
-
-    try {
-        const response = await fetch(endpoint, options)
-        if (!response.ok) {
-            throw new Error(`HTTP Error on crowdsec lapi get decision status: ${response.status}`)
-        }
-        return await response.json()
-    } catch (error) {
-        throw error
-    }
-}
-
 function _getHeaders(token) {
     return {
         'Accept': 'application/json',
@@ -94,14 +76,6 @@ function _getHeadersWithAuthToken(token) {
     }
 }
 
-function _getHeadersWithXApiKey() {
-    return {
-        ..._getHeaders(),
-        'x-api-key': config.crowdsec.lapi.apiKey
-    }
-}
-
 export default {
-    deleteDecisionsByIP,
-    getDecisionsByIP
+    deleteDecisionsByIP
 }
