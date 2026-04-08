@@ -1,0 +1,6 @@
+{
+  "no_decisions": "No decisions found for IP: {{ip}}",
+  "one_decision_deleted": "{{count}} decision deleted for IP: {{ip}}",
+  "many_decisions_deleted": "{{count}} decisions deleted for IP: {{ip}}"
+}
+

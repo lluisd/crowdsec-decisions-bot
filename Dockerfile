@@ -1,4 +1,4 @@
-FROM node:23-alpine
+FROM node:24-alpine
 
 RUN apk upgrade --no-cache
 
@@ -9,9 +9,11 @@ ENV NODE_ENV production
 
 WORKDIR /usr/src/app
 
-COPY . .
+COPY package*.json ./
 
-RUN npm install
+RUN npm ci
+
+COPY . .
 
 USER node
 

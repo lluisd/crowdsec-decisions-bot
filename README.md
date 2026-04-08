@@ -214,13 +214,13 @@ networks:
 
 Environment variables:
 
-| Variable | Description | Default value | Required |
-| -------- | ----------- | ------------- | -------- |
-| TELEGRAM_TOKEN | your Telegram bot API token  | `null` | Yes |
-| LAPI_URL | Your default Local API http address which uses port 8080  | `null` | Yes |
-| LAPI_LOGIN | Machine login of your LAPI usually in /etc/local_api_credentials.yaml file | `crowdsec` | Yes |
-| LAPI_PASSWORD | Machine password of your LAPI usually in /etc/local_api_credentials.yaml file | `null` | Yes |
-| USE_WEBHOOKS | To enable Telegram webhooks, which needs to setup a public https domain | `crowdsec` | No |
-| EXTERNAL_URL | External url used to set up the Telegram webhook | `null` | No |
-
+| Variable       | Description                                                                   | Default value | Required |
+|----------------|-------------------------------------------------------------------------------|---------------| -------- |
+| TELEGRAM_TOKEN | your Telegram bot API token                                                   | `null`        | Yes |
+| LAPI_URL       | Your default Local API http address which uses port 8080                      | `null`        | Yes |
+| LAPI_LOGIN     | Machine login of your LAPI usually in /etc/local_api_credentials.yaml file    | `crowdsec`    | Yes |
+| LAPI_PASSWORD  | Machine password of your LAPI usually in /etc/local_api_credentials.yaml file | `null`        | Yes |
+| USE_WEBHOOKS   | To enable Telegram webhooks, which needs to setup a public https domain       | `false`       | No |
+| EXTERNAL_URL   | External url used to set up the Telegram webhook                              | `null`        | No |
+| LANGUAGE       | Language for bot response messages. Supported values: `en` (English), `es` (Spanish) | `es`    | No |
 

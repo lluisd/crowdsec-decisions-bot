@@ -1,5 +1,6 @@
 export const config = {
     port: process.env.PORT || 3000,
+    language: process.env.LANGUAGE || 'es',
     telegram: {
         token: process.env.TELEGRAM_TOKEN,
         should_use_webhooks: process.env.USE_WEBHOOKS || false,

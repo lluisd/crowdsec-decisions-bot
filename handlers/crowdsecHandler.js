@@ -1,4 +1,5 @@
-import CrowdsecLocalApi from "../api/crowdsecLocalApi.js";
+import CrowdsecLocalApi from "../api/crowdsecLocalApi.js"
+import i18n from "../i18n.js"
 
 class CrowdsecHandler {
     async deleteDecisionByIp(callbackQuery, bot) {
@@ -16,12 +17,13 @@ class CrowdsecHandler {
             options.message_thread_id = messageThreadId
         }
 
-        let responseMessage = `No decisions found for IP: ${ip}`
+        let responseMessage
         if (deletedDecisions === 1) {
-            responseMessage = `${deletedDecisions} decision deleted for IP: ${ip}`
-        }
-        else if (deletedDecisions > 0) {
-            responseMessage = `${deletedDecisions} decisions deleted for IP: ${ip}`
+            responseMessage = i18n.__('one_decision_deleted', { count: deletedDecisions, ip })
+        } else if (deletedDecisions > 0) {
+            responseMessage = i18n.__('many_decisions_deleted', { count: deletedDecisions, ip })
+        } else {
+            responseMessage = i18n.__('no_decisions', { ip })
         }
 
         console.log(responseMessage)
