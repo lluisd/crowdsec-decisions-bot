@@ -50,7 +50,16 @@ async function deleteDecisionsByIP(ip) {
     }
 
     try {
-        const response = await fetch(endpoint, options)
+        let response = await fetch(endpoint, options)
+        if (response.status === 401) {
+            tokenData.token = null
+            tokenData.expiresAt = null
+            const refreshedToken = await getValidToken()
+            response = await fetch(endpoint, {
+                ...options,
+                headers: _getHeadersWithAuthToken(refreshedToken)
+            })
+        }
         if (!response.ok) {
             throw new Error(`HTTP Error on crowdsec lapi deletedecision status: ${response.status}`)
         }
